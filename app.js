@@ -84,6 +84,7 @@ function uploadToS3(file, url)
     {
       if(xhr.status == 200)
       {
+        ++done;
         setProgress(0, 'Upload completed.'); //0 not 100 Becuase the full percentage is already count in `done`
       }
       else
