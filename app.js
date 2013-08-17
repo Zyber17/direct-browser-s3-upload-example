@@ -1,3 +1,4 @@
+var total, done;
 function createCORSRequest(method, url) 
 {
   var xhr = new XMLHttpRequest();
@@ -19,6 +20,8 @@ function createCORSRequest(method, url)
 
 function handleFileSelect(evt) 
 {
+  total = 0;
+  done = 0;
   setProgress(0, 'Upload started.');
 
   var files = evt.target.files; 
@@ -45,7 +48,7 @@ function executeOnSignedUrl(file, callback)
   {
     if (this.readyState == 4 && this.status == 200) 
     {
-      callback(decodeURIComponent(this.responseText));
+      callback(this.responseText);
     }
     else if(this.readyState == 4 && this.status != 200)
     {
@@ -81,7 +84,7 @@ function uploadToS3(file, url)
     {
       if(xhr.status == 200)
       {
-        setProgress(100, 'Upload completed.');
+        setProgress(0, 'Upload completed.'); //0 not 100 Becuase the full percentage is already count in `done`
       }
       else
       {
@@ -113,9 +116,8 @@ function uploadToS3(file, url)
 function setProgress(percent, statusLabel)
 {
   var progress = document.querySelector('.percent');
-  progress.style.width = percent + '%';
-  progress.textContent = percent + '%';
+  var totalPer = (percent/100+done)/total*100 || 0;
+  progress.style.width = totalPer + '%';
+  progress.textContent = totalPer + '%';
   document.getElementById('progress_bar').className = 'loading';
-
-  document.getElementById('status').innerText = statusLabel;
 }

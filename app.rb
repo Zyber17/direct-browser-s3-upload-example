@@ -8,7 +8,7 @@ S3_SECRET='S3 secret here'
 S3_BUCKET='/uploadtestbucket'
 
 EXPIRE_TIME=(60 * 5) # 5 minutes
-S3_URL='http://s3.amazonaws.com'
+S3_URL='https://s3.amazonaws.com'
 
 get '/' do
   send_file 'index.html'
@@ -32,5 +32,5 @@ get '/signput' do
   string_to_sign = "PUT\n\n#{mime_type}\n#{expires}\n#{amz_headers}\n#{S3_BUCKET}#{object_name}"
   sig = CGI::escape(Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', S3_SECRET, string_to_sign)))
 
-  CGI::escape("#{S3_URL}#{S3_BUCKET}#{object_name}?AWSAccessKeyId=#{S3_KEY}&Expires=#{expires}&Signature=#{sig}")
+  "#{S3_URL}#{S3_BUCKET}#{object_name}?AWSAccessKeyId=#{S3_KEY}&Expires=#{expires}&Signature=#{sig}"
 end
