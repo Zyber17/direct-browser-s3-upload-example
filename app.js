@@ -1,4 +1,4 @@
-var total, done;
+var total, done, killed;
 function createCORSRequest(method, url) 
 {
   var xhr = new XMLHttpRequest();
@@ -22,6 +22,7 @@ function handleFileSelect(evt)
 {
   total = 0;
   done = 0;
+  killed = 0;
   setProgress(0, 'Upload started.');
 
   var files = evt.target.files; 
@@ -52,7 +53,14 @@ function executeOnSignedUrl(file, callback)
     }
     else if(this.readyState == 4 && this.status != 200)
     {
-      setProgress(0, 'Could not contact signing script. Status = ' + this.status);
+      ++killed;
+      if(this.status == 403){
+        if(this.responseText = "Invalid mime") {
+          alert(file.name+" is not an accepted file type.")
+        }
+      }else {
+        setProgress(0, 'Could not contact signing script. Status = ' + this.status);
+      }
     }
   };
 
@@ -117,7 +125,7 @@ function uploadToS3(file, url)
 function setProgress(percent, statusLabel)
 {
   var progress = document.querySelector('.percent');
-  var totalPer = (percent/100+done)/total*100 || 0;
+  var totalPer = (percent/100+done)/(total-killed)*100 || 0;
   progress.style.width = totalPer + '%';
   progress.textContent = totalPer + '%';
   document.getElementById('progress_bar').className = 'loading';
